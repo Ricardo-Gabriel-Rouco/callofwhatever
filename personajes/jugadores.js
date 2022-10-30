@@ -1,3 +1,4 @@
+'use strict'
 const vidabase = 100;
 const magicDamage = 10
 const phisicDamage = 10
@@ -42,7 +43,9 @@ player.prototype.damageTaken = function(ataqueMonstruo){
     return this.vida
 }
 
-var jugador = new player()
-jugador.add('hola', 'guerrero')
-console.log(jugador.status())
-// console.log(jugador.damageTaken())
+// var jugador = new player()
+// jugador.add('hola', 'guerrero')
+// console.log(jugador.status())
+// // console.log(jugador.damageTaken())
+
+module.exports = {player}

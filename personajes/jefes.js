@@ -1,3 +1,5 @@
+'use strict'
+
 const vidabase = 1000;
 const damage = 100
 var nombre = null;
@@ -33,7 +35,9 @@ monstruosEpicos.prototype.damageTaken = function(ataqueJugador){
     return this.vida
 }
 
-var tulu = new monstruosEpicos()
-tulu.add('tulu', 2)
-console.log(tulu.status())
+// var tulu = new monstruosEpicos()
+// tulu.add('tulu', 2)
+// console.log(tulu.status())
 // console.log(jugador.damageTaken())
+
+module.exports = {monstruosEpicos}
