@@ -4,6 +4,6 @@ class monstruosEpicos {
         this.vida = 1000;
         this.dañofisico = 0;
         this.dañomagico = 0;
-        this.dificultad = 0;
     }
 }
+
