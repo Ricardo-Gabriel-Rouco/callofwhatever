@@ -8,6 +8,62 @@ a:after {
   left: 0;
   transition: right 0.4s cubic-bezier(0, 0.5, 0, 1);
 }
+#boton {
+  float: right;
+  margin-right: 35px;
+}
+.switchBtn {
+  position: relative;
+  display: inline-block;
+  width: 110px;
+  height: 34px;
+}
+.switchBtn input {
+  display: none;
+}
+.slide {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ab93ab;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  padding: 8px;
+  color: #542750;
+}
+.slide:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 78px;
+  bottom: 4px;
+  background-color: #f8dff8;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+input:checked + .slide {
+  background-color: #4fa3ab;
+  padding-left: 40px;
+}
+input:focus + .slide {
+  box-shadow: 0 0 1px #01aeed;
+}
+input:checked + .slide:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+  left: -20px;
+}
+.slide.round {
+  border-radius: 34px;
+}
+.slide.round:before {
+  border-radius: 50%;
+}
 img {
   width: 250px;
   height: 200px;
@@ -25,7 +81,7 @@ a {
 }
 a:hover {
   text-decoration: none;
-  background-color: #27542b;
+  background-color: #275054;
 }
 nav {
   display: inline;
@@ -34,7 +90,7 @@ nav {
 nav h1 {
   display: flex;
   justify-content: center;
-  padding-top: 50px;
+  padding-top: 35px;
   padding-bottom: 40px;
   font-size: 3.6rem;
 }
@@ -62,4 +118,5 @@ li {
   font-size: 2.4rem;
   padding: 10px 15px;
   border: solid 2px black;
+  border-radius: 8px;
 }
