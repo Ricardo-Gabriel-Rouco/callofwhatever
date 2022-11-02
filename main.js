@@ -1,5 +1,2 @@
-'use strict'
-const modules = require('./personajes/jefes', './personajes/jugadores')
+const canvas = document.querySelector('canvas')
 
-// animaciones
-const animado = document.getElementsByClassName('animado')
