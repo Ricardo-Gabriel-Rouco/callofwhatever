@@ -8,5 +8,5 @@ image.src ='./assets/prototipomapa.png'
 c.fillRect(0, 0 , canvas.width, canvas.height)
 
 image.onload = () => {
-    c.drawImage(image, -1000, -460)
+    c.drawImage(image, -900, -460)
 }
