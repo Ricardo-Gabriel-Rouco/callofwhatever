@@ -25,7 +25,7 @@ class texturas{
 }
 const background = new texturas({
     posicion: {
-        x: -1750, 
+        x: -1730, 
         y: -980}
     ,
     imagen: image
