@@ -12,35 +12,39 @@ for (let i = 0; i < colisiones.length; i+=75){
     colisionesMapa.push(colisiones.slice(i, 75 + i))
 }
 
-class Limite{
+class Limite{ //BOundary
     static ancho = 36
     static alto = 36
-    constructor({ubicacion}){
-        this.ubicacion = ubicacion
+    constructor({posicion}){
+        this.posicion = posicion
         this.ancho = 36
         this.alto = 36
     }
 
     draw(){
-        c.fillRect(this.ubicacion.x, this.ubicacion.y, this.ancho, this.alto)
+        c.fillStyle = 'rgba(255, 0 , 0 , 0)'
+        c.fillRect(this.posicion.x, this.posicion.y, this.ancho, this.alto)
     }
 }
 
-const boundaries = []
+const boundaries = [] //boundaries
+// esto es por el desplazamiento del mapa. o sea la posicion inicial
+const offset = {
+    x: -1730,
+    y: -980
+}
 colisionesMapa.forEach((row, i) =>{
     row.forEach((simbol, j)=>{
         if(simbol === 1025){
         boundaries.push(new Limite({
-            ubicacion: {
-                x: j * Limite.ancho,
-                y: i * Limite.alto
+            posicion: {
+                x: j * Limite.ancho + offset.x,
+                y: i * Limite.alto + offset.y
             }
         }))
     }
     })
 })
-
-console.log(boundaries)
 
 const image = new Image()
 image.src ='./assets/prototipomapa.png'
@@ -52,19 +56,52 @@ playerImage.src = './assets/playerDown.png'
 
 
 class texturas{
-    constructor({posicion, velocidad, imagen}){
+    constructor({posicion, velocidad, imagen, frames = {max: 1}}){
         this.posicion = posicion
         this.imagen = imagen
+        this.frames = frames
+        this.imagen.onload = () => {
+            this.width = this.imagen.width / this.frames.max
+            this.height = this.imagen.height
+            console.log(this.width)
+            console.log(this.height)
+
+        }
     }
 
     draw() {
-        c.drawImage(this.imagen, this.posicion.x, this.posicion.y)
+        c.drawImage(
+            this.imagen,
+            0,
+            0,
+            this.imagen.width / this.frames.max,
+            this.imagen.height,
+            this.posicion.x,
+            this.posicion.y,              
+            this.imagen.width / this.frames.max,
+            this.imagen.height )
     }
 }
+
+// , 
+
+const player = new texturas({
+    posicion: {
+        x: canvas.width / 2,
+        y: canvas.height /2
+    },
+    imagen: playerImage,
+    frames: {
+        max: 4,
+    }
+}
+)
+
 const background = new texturas({
     posicion: {
-        x: -1730, 
-        y: -980}
+        x: offset.x, 
+        y: offset.y
+    }
     ,
     imagen: image
 }
@@ -89,34 +126,109 @@ const keys = {
     }
 }
 
+// objetos movibles, o sea que se tienen que desplazar
+const movibles = [background, ...boundaries]
+// esto es la funcion que revisa las colisiones como tales
+function colisionRectangular({rectangulo1, rectangulo2}){
+    return(
+        rectangulo1.posicion.x + rectangulo1.width >= rectangulo2.posicion.x && 
+        rectangulo1.posicion.x <= rectangulo2.posicion.x + rectangulo2.ancho &&
+        rectangulo1.posicion.y <= rectangulo2.posicion.y + rectangulo2.alto &&
+        rectangulo1.posicion.y + rectangulo1.height >= rectangulo2.posicion.y
+    )
+}
 // loop principal de animacion
 function animar(){
     window.requestAnimationFrame(animar)
     background.draw()
-    boundaries.forEach(limite =>{
-        limite.draw()
-    })
-    c.drawImage(playerImage,
-        // recorte de imagen
-        0,
-        0,
-        playerImage.width / 4,
-        playerImage.height, 
-       // aca termina el recorte de imagen
-        // aca empieza donde se renderiza la imagen y lo que se renderiza    
-        canvas.width / 2, canvas.height /2,
-        playerImage.width / 4,
-        playerImage.height )
-    boundaries.forEach(limite =>{
-            console.log(limite)
-            limite.draw()
-       })
-
-    if(keys.w.pressed && lastKey === 'w') background.posicion.y += 3
-    else if(keys.s.pressed && lastKey === 's') background.posicion.y -= 3
-    else if(keys.a.pressed && lastKey === 'a') background.posicion.x += 3
-    else if(keys.d.pressed && lastKey === 'd') background.posicion.x -= 3
+    boundaries.forEach(boundary =>{
+        boundary.draw()
+    }
+    )
+    
+    player.draw()
+    let moving = true
+    console.log(moving)
+    //esta es la parte del moviento
+    if(keys.w.pressed && lastKey === 'w'){
+        for(let i = 0; i < boundaries.length; i++){
+            const boundary = boundaries[i]
+            if(colisionRectangular({
+                rectangulo1: player,
+                rectangulo2: {...boundary, posicion:{
+                    x: boundary.posicion.x,
+                    y: boundary.posicion.y +3
+                }}
+            })){
+                moving = false
+                break
+            }
+            }
+        if(moving){
+        movibles.forEach(movible => {
+            movible.posicion.y += 3
+        })
+    }
+    }
+    else if(keys.s.pressed && lastKey === 's'){
+        for(let i = 0; i < boundaries.length; i++){
+            const boundary = boundaries[i]
+            if(colisionRectangular({
+                rectangulo1: player,
+                rectangulo2: {...boundary, posicion:{
+                    x: boundary.posicion.x,
+                    y: boundary.posicion.y -3
+                }}
+            })){
+                moving = false
+                break
+            }
+            }
+        if(moving){
+        movibles.forEach(movible => {
+            movible.posicion.y -= 3
+        })}
+    }
+    else if(keys.a.pressed && lastKey === 'a') {
+        for(let i = 0; i < boundaries.length; i++){
+            const boundary = boundaries[i]
+            if(colisionRectangular({
+                rectangulo1: player,
+                rectangulo2: {...boundary, posicion:{
+                    x: boundary.posicion.x +3,
+                    y: boundary.posicion.y
+                }}
+            })){
+                moving = false
+                break
+            }
+            }
+        if(moving){
+        movibles.forEach(movible => {
+            movible.posicion.x += 3
+        })}
+    }
+    else if(keys.d.pressed && lastKey === 'd') {
+        for(let i = 0; i < boundaries.length; i++){
+            const boundary = boundaries[i]
+            if(colisionRectangular({
+                rectangulo1: player,
+                rectangulo2: {...boundary, posicion:{
+                    x: boundary.posicion.x -3,
+                    y: boundary.posicion.y
+                }}
+            })){
+                moving = false
+                break
+            }
+            }
+        if(moving){
+        movibles.forEach(movible => {
+            movible.posicion.x -= 3
+        })}
+    }
 }
+
 
 animar()
 // tomo el navegador como objeto y le agrego un escuchador de eventos. esta primera parate es para ver si las teclas se pulsan
