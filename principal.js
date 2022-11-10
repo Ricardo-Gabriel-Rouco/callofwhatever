@@ -1,8 +1,46 @@
 const canvas = document.getElementById('main-canvas')
 const c = canvas.getContext('2d')
+
 canvas.width = 720;
 canvas.height = 510;
-c.fillRect(0, 0 , canvas.width, canvas.height)
+
+// con esto voy a trabajar en las colisiones, o sea en los limites del mapa
+
+const colisionesMapa = []
+// mi mapa es de 75 * 45 patrones
+for (let i = 0; i < colisiones.length; i+=75){
+    colisionesMapa.push(colisiones.slice(i, 75 + i))
+}
+
+class Limite{
+    static ancho = 36
+    static alto = 36
+    constructor({ubicacion}){
+        this.ubicacion = ubicacion
+        this.ancho = 36
+        this.alto = 36
+    }
+
+    draw(){
+        c.fillRect(this.ubicacion.x, this.ubicacion.y, this.ancho, this.alto)
+    }
+}
+
+const boundaries = []
+colisionesMapa.forEach((row, i) =>{
+    row.forEach((simbol, j)=>{
+        if(simbol === 1025){
+        boundaries.push(new Limite({
+            ubicacion: {
+                x: j * Limite.ancho,
+                y: i * Limite.alto
+            }
+        }))
+    }
+    })
+})
+
+console.log(boundaries)
 
 const image = new Image()
 image.src ='./assets/prototipomapa.png'
@@ -55,6 +93,9 @@ const keys = {
 function animar(){
     window.requestAnimationFrame(animar)
     background.draw()
+    boundaries.forEach(limite =>{
+        limite.draw()
+    })
     c.drawImage(playerImage,
         // recorte de imagen
         0,
@@ -66,6 +107,10 @@ function animar(){
         canvas.width / 2, canvas.height /2,
         playerImage.width / 4,
         playerImage.height )
+    boundaries.forEach(limite =>{
+            console.log(limite)
+            limite.draw()
+       })
 
     if(keys.w.pressed && lastKey === 'w') background.posicion.y += 3
     else if(keys.s.pressed && lastKey === 's') background.posicion.y -= 3
