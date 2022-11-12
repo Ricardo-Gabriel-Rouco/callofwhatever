@@ -12,21 +12,6 @@ for (let i = 0; i < colisiones.length; i+=75){
     colisionesMapa.push(colisiones.slice(i, 75 + i))
 }
 
-class Limite{ //BOundary
-    static ancho = 36
-    static alto = 36
-    constructor({posicion}){
-        this.posicion = posicion
-        this.ancho = 36
-        this.alto = 36
-    }
-
-    draw(){
-        c.fillStyle = 'rgba(255, 0 , 0 , 0)'
-        c.fillRect(this.posicion.x, this.posicion.y, this.ancho, this.alto)
-    }
-}
-
 const boundaries = [] //boundaries
 // esto es por el desplazamiento del mapa. o sea la posicion inicial
 const offset = {
@@ -49,50 +34,32 @@ colisionesMapa.forEach((row, i) =>{
 const image = new Image()
 image.src ='./assets/prototipomapa.png'
 
-const playerImage = new Image()
-playerImage.src = './assets/playerDown.png'
+const foregroundImage = new Image()
+foregroundImage.src ='./assets/parte superior.png'
 
-// creamos la clase que renderiza los sprites/texturas
-
-
-class texturas{
-    constructor({posicion, velocidad, imagen, frames = {max: 1}}){
-        this.posicion = posicion
-        this.imagen = imagen
-        this.frames = frames
-        this.imagen.onload = () => {
-            this.width = this.imagen.width / this.frames.max
-            this.height = this.imagen.height
-            console.log(this.width)
-            console.log(this.height)
-
-        }
-    }
-
-    draw() {
-        c.drawImage(
-            this.imagen,
-            0,
-            0,
-            this.imagen.width / this.frames.max,
-            this.imagen.height,
-            this.posicion.x,
-            this.posicion.y,              
-            this.imagen.width / this.frames.max,
-            this.imagen.height )
-    }
-}
-
-// , 
+const playerDownImage = new Image()
+playerDownImage.src = './assets/playerDown.png'
+const playerUpImage = new Image()
+playerUpImage.src = './assets/playerUp.png'
+const playerLeftImage = new Image()
+playerLeftImage.src = './assets/playerLeft.png'
+const playerRightImage = new Image()
+playerRightImage.src = './assets/playerRight.png'
 
 const player = new texturas({
     posicion: {
         x: canvas.width / 2,
         y: canvas.height /2
     },
-    imagen: playerImage,
+    imagen: playerDownImage,
     frames: {
         max: 4,
+    },
+    sprites: {
+        up: playerUpImage,
+        down: playerDownImage,
+        left: playerLeftImage,
+        right: playerRightImage 
     }
 }
 )
@@ -106,6 +73,15 @@ const background = new texturas({
     imagen: image
 }
     )
+
+const foreground = new texturas({
+   posicion: {
+       x: offset.x, 
+       y: offset.y
+   },
+   imagen: foregroundImage
+    }
+)
 
 // defino las teclas si estan presionadas o no
 const keys = {
@@ -127,7 +103,7 @@ const keys = {
 }
 
 // objetos movibles, o sea que se tienen que desplazar
-const movibles = [background, ...boundaries]
+const movibles = [background, ...boundaries, foreground]
 // esto es la funcion que revisa las colisiones como tales
 function colisionRectangular({rectangulo1, rectangulo2}){
     return(
@@ -145,12 +121,14 @@ function animar(){
         boundary.draw()
     }
     )
-    
     player.draw()
+    foreground.draw()
     let moving = true
-    console.log(moving)
     //esta es la parte del moviento
+    player.moving = false
     if(keys.w.pressed && lastKey === 'w'){
+        player.moving = true
+        player.imagen = player.sprites.up
         for(let i = 0; i < boundaries.length; i++){
             const boundary = boundaries[i]
             if(colisionRectangular({
@@ -171,6 +149,8 @@ function animar(){
     }
     }
     else if(keys.s.pressed && lastKey === 's'){
+        player.moving = true
+        player.imagen = player.sprites.down
         for(let i = 0; i < boundaries.length; i++){
             const boundary = boundaries[i]
             if(colisionRectangular({
@@ -190,6 +170,8 @@ function animar(){
         })}
     }
     else if(keys.a.pressed && lastKey === 'a') {
+        player.moving = true
+        player.imagen = player.sprites.left
         for(let i = 0; i < boundaries.length; i++){
             const boundary = boundaries[i]
             if(colisionRectangular({
@@ -204,11 +186,14 @@ function animar(){
             }
             }
         if(moving){
-        movibles.forEach(movible => {
-            movible.posicion.x += 3
-        })}
+            movibles.forEach(movible => {
+                movible.posicion.x += 3
+            })
+        }
     }
     else if(keys.d.pressed && lastKey === 'd') {
+        player.moving = true
+        player.imagen = player.sprites.right
         for(let i = 0; i < boundaries.length; i++){
             const boundary = boundaries[i]
             if(colisionRectangular({
@@ -256,7 +241,7 @@ window.addEventListener('keydown', (e) => {
         lastKey = 'd'
         break
     }
-    console.log(keys)
+
 })
 
 window.addEventListener('keyup', (e) => {
@@ -278,5 +263,4 @@ window.addEventListener('keyup', (e) => {
         keys.d.pressed = false
         break
     }
-    console.log(keys)
 })
